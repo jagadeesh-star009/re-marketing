@@ -151,6 +151,7 @@ export default async function HomePage() {
           <form
             action="/requirements"
             method="GET"
+            className="search-bar-form"
             style={{
               display: "flex",
               alignItems: "center",
@@ -260,7 +261,7 @@ export default async function HomePage() {
       {/* SECTION 2: E-Commerce Category Departments */}
       <section style={{ padding: "50px 0 30px 0" }}>
         <div className="container">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "24px" }}>
+          <div className="section-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "24px" }}>
             <div>
               <h2 style={{ fontSize: "24px", fontWeight: 800, fontFamily: "var(--font-display)" }}>
                 Explore Marketplace Categories
@@ -276,7 +277,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
+          <div className="grid-depts" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "16px" }}>
             {departments.map((dept, idx) => (
               <Link key={idx} href={`/requirements?type=${dept.type}`}>
                 <div
@@ -309,7 +310,7 @@ export default async function HomePage() {
       {/* SECTION 3: Live Buyer Demands Catalog (The Core Showcase) */}
       <section style={{ padding: "40px 0 60px 0" }}>
         <div className="container">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "28px", flexWrap: "wrap", gap: "12px" }}>
+          <div className="section-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "28px", flexWrap: "wrap", gap: "12px" }}>
             <div>
               <div style={{ display: "inline-flex", marginBottom: "8px" }}>
                 <Badge variant="cyan">Live Reverse Catalog</Badge>
@@ -337,7 +338,7 @@ export default async function HomePage() {
           </div>
 
           {/* Demands Catalog Grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "24px" }}>
+          <div className="grid-demands" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "24px" }}>
             {requirements.map((req) => {
               const offerCount = req.offers?.length || 0;
               const topScore = req.offers?.[0]?.compatibilityScore?.overallScore || 95;
@@ -489,7 +490,7 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "20px" }}>
+            <div className="grid-offers" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: "20px" }}>
               {recentOffers.map((offer) => {
                 const vendor = offer.vendorProfile;
                 const score = Math.round(offer.compatibilityScore?.overallScore || 98);
@@ -576,7 +577,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px" }}>
+          <div className="grid-steps" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px" }}>
             <Card glow={false}>
               <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: "rgba(0, 255, 157, 0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--accent-cyan)", fontWeight: 800, fontSize: "16px", marginBottom: "16px" }}>
                 01
@@ -632,7 +633,7 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "20px" }}>
+            <div className="grid-vendors" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "20px" }}>
               {vendors.map((v) => (
                 <Card key={v.id}>
                   <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "14px" }}>
@@ -689,6 +690,7 @@ export default async function HomePage() {
       <section style={{ padding: "60px 0 20px 0" }}>
         <div className="container">
           <div
+            className="cta-banner"
             style={{
               padding: "48px 32px",
               borderRadius: "var(--radius-xl)",

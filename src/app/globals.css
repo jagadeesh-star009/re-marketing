@@ -317,3 +317,136 @@ input:focus, select:focus, textarea:focus {
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================
+   NAVBAR RESPONSIVE
+   ============================================================ */
+/* Mobile: show hamburger, hide desktop nav & vendor link */
+.nav-desktop {
+  display: none !important;
+}
+.nav-mobile-toggle {
+  display: flex !important;
+}
+.nav-vendor-link {
+  display: none !important;
+}
+
+/* Desktop (≥992px): show desktop nav, hide hamburger */
+@media (min-width: 992px) {
+  .nav-desktop {
+    display: flex !important;
+  }
+  .nav-mobile-toggle {
+    display: none !important;
+  }
+  .nav-vendor-link {
+    display: flex !important;
+  }
+}
+
+/* Navbar link hover */
+.nav-link {
+  transition: color var(--transition-fast);
+}
+.nav-link:hover {
+  color: var(--accent-cyan) !important;
+}
+
+/* Mobile drawer links */
+.mobile-drawer-link {
+  color: var(--text-secondary);
+  transition: color var(--transition-fast);
+  padding: 2px 0;
+}
+.mobile-drawer-link:hover {
+  color: var(--accent-cyan);
+}
+
+/* ============================================================
+   SITE-WIDE MOBILE RESPONSIVENESS
+   ============================================================ */
+
+/* Reduce container padding on small screens */
+@media (max-width: 640px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  /* Hero section compact on mobile */
+  .hero-title {
+    font-size: 26px !important;
+  }
+
+  /* Search bar stacks on mobile */
+  .search-bar-form {
+    flex-direction: column;
+    padding: 12px !important;
+    gap: 12px !important;
+    border-radius: var(--radius-md) !important;
+  }
+  .search-bar-form input {
+    width: 100%;
+  }
+  .search-bar-form a,
+  .search-bar-form button {
+    width: 100%;
+  }
+
+  /* CTA banner padding */
+  .cta-banner {
+    padding: 32px 20px !important;
+  }
+
+  /* Section header stacks on mobile */
+  .section-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  /* Marketplace card full-width */
+  .marketplace-card {
+    padding: 18px !important;
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 768px) {
+  /* Grid overrides: force 1-col on small, 2-col on medium */
+  .grid-demands {
+    grid-template-columns: 1fr !important;
+  }
+  .grid-offers {
+    grid-template-columns: 1fr !important;
+  }
+  .grid-vendors {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .grid-depts {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .grid-steps {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Ensure images and embeds never overflow */
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Dashboard/detail page table scroll */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Form fields full-width on mobile */
+@media (max-width: 600px) {
+  .form-grid-2col {
+    grid-template-columns: 1fr !important;
+  }
+}

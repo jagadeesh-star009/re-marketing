@@ -16,11 +16,7 @@ import {
   ChevronDown,
   Menu,
   X,
-  Search,
-  Package,
-  Wrench,
-  CheckCircle2,
-  Users
+  Users,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { Button } from "@/components/ui/Button";
@@ -66,6 +62,11 @@ export const Navbar: React.FC = () => {
     fetchSession();
   }, [pathname]);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     setCurrentUser(null);
@@ -91,6 +92,19 @@ export const Navbar: React.FC = () => {
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
+  const navLinks = [
+    { href: "/requirements", label: "Browse Demands" },
+    { href: "/requirements?type=PRODUCT", label: "Products" },
+    { href: "/requirements?type=SERVICE", label: "Services" },
+    { href: "/vendor-dashboard", label: "Vendor Hub" },
+  ];
+
+  const isActive = (href: string) => {
+    if (href === "/requirements") return pathname === "/requirements";
+    return pathname + (typeof window !== "undefined" ? window.location.search : "") === href
+      || (href.includes("?") && typeof window !== "undefined" && window.location.search.includes(href.split("?")[1]));
+  };
+
   return (
     <>
       <header
@@ -111,11 +125,12 @@ export const Navbar: React.FC = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            height: "70px",
+            height: "68px",
           }}
         >
-          {/* Left: Brand Logo & Navigation */}
-          <div style={{ display: "flex", alignItems: "center", gap: "36px" }}>
+          {/* Left: Brand Logo & Desktop Navigation */}
+          <div style={{ display: "flex", alignItems: "center", gap: "32px" }}>
+            {/* Logo */}
             <Link
               href="/"
               style={{
@@ -126,12 +141,13 @@ export const Navbar: React.FC = () => {
                 fontSize: "20px",
                 fontWeight: 800,
                 letterSpacing: "-0.02em",
+                flexShrink: 0,
               }}
             >
               <div
                 style={{
-                  width: "36px",
-                  height: "36px",
+                  width: "34px",
+                  height: "34px",
                   borderRadius: "10px",
                   background: "var(--grad-primary)",
                   display: "flex",
@@ -139,82 +155,49 @@ export const Navbar: React.FC = () => {
                   justifyContent: "center",
                   color: "#05070d",
                   boxShadow: "0 0 16px rgba(0, 255, 157, 0.35)",
+                  flexShrink: 0,
                 }}
               >
-                <Sparkles size={19} />
+                <Sparkles size={18} />
               </div>
               <span style={{ color: "var(--text-primary)" }}>
                 Reverse<span className="text-gradient-cyan">Market</span>
               </span>
             </Link>
 
-            {/* Desktop Navigation Links */}
+            {/* Desktop Navigation — hidden on mobile via .nav-desktop class */}
             <nav
+              className="nav-desktop"
               style={{
-                display: "none",
                 alignItems: "center",
                 gap: "28px",
                 fontSize: "14px",
                 fontWeight: 600,
               }}
-              className="desktop-nav"
             >
-              <style jsx>{`
-                @media (min-width: 992px) {
-                  .desktop-nav {
-                    display: flex !important;
-                  }
-                }
-              `}</style>
-
-              <Link
-                href="/requirements"
-                style={{
-                  color: pathname === "/requirements" ? "var(--accent-cyan)" : "var(--text-secondary)",
-                  transition: "color var(--transition-fast)",
-                }}
-              >
-                Browse Demands
-              </Link>
-
-              <Link
-                href="/requirements?type=PRODUCT"
-                style={{
-                  color: pathname.includes("type=PRODUCT") ? "var(--accent-cyan)" : "var(--text-secondary)",
-                  transition: "color var(--transition-fast)",
-                }}
-              >
-                Products
-              </Link>
-
-              <Link
-                href="/requirements?type=SERVICE"
-                style={{
-                  color: pathname.includes("type=SERVICE") ? "var(--accent-cyan)" : "var(--text-secondary)",
-                  transition: "color var(--transition-fast)",
-                }}
-              >
-                Services
-              </Link>
-
-              <Link
-                href="/vendor-dashboard"
-                style={{
-                  color: pathname === "/vendor-dashboard" ? "var(--accent-cyan)" : "var(--text-secondary)",
-                  transition: "color var(--transition-fast)",
-                }}
-              >
-                Vendor Hub
-              </Link>
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="nav-link"
+                  style={{
+                    color: pathname === link.href.split("?")[0] && link.href === "/requirements"
+                      ? "var(--accent-cyan)"
+                      : "var(--text-secondary)",
+                  }}
+                >
+                  {link.label}
+                </Link>
+              ))}
             </nav>
           </div>
 
-          {/* Right Side Clean Actions */}
-          <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+          {/* Right Side Actions */}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             {/* Theme Toggle */}
             <ThemeToggle />
 
-            {/* Notifications (if logged in) */}
+            {/* Notifications — only if logged in */}
             {currentUser && (
               <div style={{ position: "relative" }}>
                 <button
@@ -222,8 +205,8 @@ export const Navbar: React.FC = () => {
                   aria-label="Notifications"
                   style={{
                     position: "relative",
-                    width: "38px",
-                    height: "38px",
+                    width: "36px",
+                    height: "36px",
                     borderRadius: "var(--radius-sm)",
                     background: "var(--bg-tertiary)",
                     border: "1px solid var(--border-subtle)",
@@ -231,9 +214,10 @@ export const Navbar: React.FC = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     color: "var(--text-primary)",
+                    flexShrink: 0,
                   }}
                 >
-                  <Bell size={17} />
+                  <Bell size={16} />
                   {unreadCount > 0 && (
                     <span
                       style={{
@@ -244,8 +228,8 @@ export const Navbar: React.FC = () => {
                         color: "#fff",
                         fontSize: "10px",
                         fontWeight: 800,
-                        width: "18px",
-                        height: "18px",
+                        width: "17px",
+                        height: "17px",
                         borderRadius: "50%",
                         display: "flex",
                         alignItems: "center",
@@ -263,17 +247,17 @@ export const Navbar: React.FC = () => {
                     style={{
                       position: "absolute",
                       right: 0,
-                      top: "48px",
-                      width: "320px",
+                      top: "46px",
+                      width: "300px",
                       background: "var(--bg-secondary)",
                       border: "1px solid var(--border-glow)",
                       borderRadius: "var(--radius-md)",
                       boxShadow: "var(--shadow-lg)",
                       zIndex: 200,
-                      padding: "16px",
+                      padding: "14px",
                     }}
                   >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
                       <span style={{ fontWeight: 700, fontSize: "14px", color: "var(--text-primary)" }}>
                         Notifications
                       </span>
@@ -292,7 +276,7 @@ export const Navbar: React.FC = () => {
                       </button>
                     </div>
 
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px", maxHeight: "260px", overflowY: "auto" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "260px", overflowY: "auto" }}>
                       {notifications.length === 0 ? (
                         <p style={{ fontSize: "13px", color: "var(--text-muted)", textAlign: "center", padding: "16px 0" }}>
                           No notifications yet.
@@ -304,7 +288,7 @@ export const Navbar: React.FC = () => {
                             href={n.linkUrl || "#"}
                             onClick={() => setShowNotifications(false)}
                             style={{
-                              padding: "10px",
+                              padding: "9px",
                               borderRadius: "var(--radius-sm)",
                               background: n.isRead ? "transparent" : "rgba(0, 255, 157, 0.06)",
                               borderLeft: n.isRead ? "none" : "3px solid var(--accent-cyan)",
@@ -326,16 +310,9 @@ export const Navbar: React.FC = () => {
               </div>
             )}
 
-            {/* Become a Vendor (for non-vendors/guests) */}
+            {/* Become a Vendor — desktop only, hidden on mobile via CSS */}
             {(!currentUser || currentUser?.role !== "VENDOR") && (
-              <Link href="/register?role=VENDOR" className="desktop-vendor-link">
-                <style jsx>{`
-                  @media (max-width: 900px) {
-                    :global(.desktop-vendor-link) {
-                      display: none !important;
-                    }
-                  }
-                `}</style>
+              <Link href="/register?role=VENDOR" className="nav-vendor-link" style={{ alignItems: "center" }}>
                 <Button
                   variant="outline"
                   size="sm"
@@ -343,6 +320,7 @@ export const Navbar: React.FC = () => {
                     borderColor: "rgba(157, 78, 221, 0.4)",
                     color: "var(--accent-purple)",
                     fontSize: "13px",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   Become a Vendor
@@ -350,15 +328,15 @@ export const Navbar: React.FC = () => {
               </Link>
             )}
 
-            {/* Primary CTA: Post a Requirement */}
-            <Link href="/requirements/new">
+            {/* Post a Requirement CTA — desktop only */}
+            <Link href="/requirements/new" className="nav-vendor-link" style={{ alignItems: "center" }}>
               <Button
                 variant="glow"
                 size="sm"
-                leftIcon={<PlusCircle size={15} />}
-                style={{ fontWeight: 700 }}
+                leftIcon={<PlusCircle size={14} />}
+                style={{ fontWeight: 700, whiteSpace: "nowrap" }}
               >
-                Post a Requirement
+                Post Requirement
               </Button>
             </Link>
 
@@ -370,14 +348,15 @@ export const Navbar: React.FC = () => {
                   style={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "8px",
-                    padding: "6px 12px",
+                    gap: "7px",
+                    padding: "5px 10px",
                     borderRadius: "var(--radius-sm)",
                     background: "var(--bg-tertiary)",
                     border: "1px solid var(--border-subtle)",
                     color: "var(--text-primary)",
                     fontSize: "13px",
                     fontWeight: 600,
+                    flexShrink: 0,
                   }}
                 >
                   <div
@@ -392,24 +371,34 @@ export const Navbar: React.FC = () => {
                       justifyContent: "center",
                       fontSize: "11px",
                       fontWeight: 800,
+                      flexShrink: 0,
                     }}
                   >
                     {currentUser.name?.charAt(0) || "U"}
                   </div>
-                  <span className="user-name" style={{ maxWidth: "100px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <span
+                    style={{
+                      maxWidth: "90px",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      display: "none",
+                    }}
+                    className="nav-desktop"
+                  >
                     {currentUser.name}
                   </span>
-                  <ChevronDown size={14} />
+                  <ChevronDown size={13} />
                 </button>
 
-                {/* Clean User Dropdown */}
+                {/* User Dropdown */}
                 {userDropdownOpen && (
                   <div
                     style={{
                       position: "absolute",
                       right: 0,
                       top: "44px",
-                      width: "220px",
+                      width: "210px",
                       background: "var(--bg-secondary)",
                       border: "1px solid var(--border-subtle)",
                       borderRadius: "var(--radius-md)",
@@ -430,7 +419,7 @@ export const Navbar: React.FC = () => {
                           onClick={() => setUserDropdownOpen(false)}
                           style={{ padding: "8px 12px", borderRadius: "6px", fontSize: "13px", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "8px" }}
                         >
-                          <Layers size={15} /> Buyer Command Center
+                          <Layers size={14} /> My Dashboard
                         </Link>
                       )}
 
@@ -440,7 +429,7 @@ export const Navbar: React.FC = () => {
                           onClick={() => setUserDropdownOpen(false)}
                           style={{ padding: "8px 12px", borderRadius: "6px", fontSize: "13px", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "8px" }}
                         >
-                          <Briefcase size={15} /> Vendor Opportunity Hub
+                          <Briefcase size={14} /> Vendor Hub
                         </Link>
                       )}
 
@@ -449,7 +438,7 @@ export const Navbar: React.FC = () => {
                         onClick={() => setUserDropdownOpen(false)}
                         style={{ padding: "8px 12px", borderRadius: "6px", fontSize: "13px", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "8px" }}
                       >
-                        <MessageSquare size={15} /> Private Chat
+                        <MessageSquare size={14} /> Messages
                       </Link>
 
                       {currentUser.role === "ADMIN" && (
@@ -458,7 +447,7 @@ export const Navbar: React.FC = () => {
                           onClick={() => setUserDropdownOpen(false)}
                           style={{ padding: "8px 12px", borderRadius: "6px", fontSize: "13px", color: "var(--text-secondary)", display: "flex", alignItems: "center", gap: "8px" }}
                         >
-                          <ShieldCheck size={15} /> Admin Console
+                          <ShieldCheck size={14} /> Admin Console
                         </Link>
                       )}
 
@@ -478,7 +467,7 @@ export const Navbar: React.FC = () => {
                           borderTop: "1px solid var(--border-subtle)",
                         }}
                       >
-                        <LogOut size={15} /> Sign Out
+                        <LogOut size={14} /> Sign Out
                       </button>
                     </div>
                   </div>
@@ -492,30 +481,24 @@ export const Navbar: React.FC = () => {
               </Link>
             )}
 
-            {/* Mobile Hamburger Button */}
+            {/* Mobile Hamburger — hidden on desktop via .nav-mobile-toggle class */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="nav-mobile-toggle"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               style={{
-                display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                padding: "8px",
+                width: "36px",
+                height: "36px",
+                borderRadius: "var(--radius-sm)",
+                background: "var(--bg-tertiary)",
+                border: "1px solid var(--border-subtle)",
                 color: "var(--text-primary)",
+                flexShrink: 0,
               }}
-              className="mobile-toggle"
-              aria-label="Open menu"
             >
-              <style jsx>{`
-                .mobile-toggle {
-                  display: flex;
-                }
-                @media (min-width: 992px) {
-                  .mobile-toggle {
-                    display: none;
-                  }
-                }
-              `}</style>
-              {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
@@ -524,38 +507,81 @@ export const Navbar: React.FC = () => {
         {mobileMenuOpen && (
           <div
             style={{
-              padding: "20px 24px",
+              padding: "20px 24px 28px 24px",
               background: "var(--bg-secondary)",
               borderBottom: "1px solid var(--border-glow)",
               display: "flex",
               flexDirection: "column",
-              gap: "16px",
-              fontSize: "15px",
-              fontWeight: 600,
+              gap: "4px",
             }}
           >
-            <Link href="/requirements" onClick={() => setMobileMenuOpen(false)}>
-              Browse Demands
+            {/* Section: Browse */}
+            <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", color: "var(--text-muted)", marginBottom: "8px", marginTop: "4px" }}>
+              MARKETPLACE
+            </div>
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="mobile-drawer-link"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  padding: "9px 12px",
+                  borderRadius: "var(--radius-sm)",
+                  display: "block",
+                  background: pathname === link.href.split("?")[0] && !link.href.includes("?") ? "rgba(0,255,157,0.07)" : "transparent",
+                  color: pathname === link.href.split("?")[0] && !link.href.includes("?") ? "var(--accent-cyan)" : "var(--text-secondary)",
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            {/* Divider */}
+            <div style={{ height: "1px", background: "var(--border-subtle)", margin: "14px 0" }} />
+
+            {/* Section: CTAs */}
+            <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", color: "var(--text-muted)", marginBottom: "8px" }}>
+              ACTIONS
+            </div>
+            <Link href="/requirements/new" onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="glow" size="md" leftIcon={<PlusCircle size={16} />} style={{ width: "100%", justifyContent: "center", fontWeight: 700 }}>
+                Post a Requirement
+              </Button>
             </Link>
-            <Link href="/requirements?type=PRODUCT" onClick={() => setMobileMenuOpen(false)}>
-              Products Needed
-            </Link>
-            <Link href="/requirements?type=SERVICE" onClick={() => setMobileMenuOpen(false)}>
-              Services Needed
-            </Link>
-            <Link href="/requirements/new" onClick={() => setMobileMenuOpen(false)} style={{ color: "var(--accent-cyan)", fontWeight: 700 }}>
-              + Post a Requirement
-            </Link>
-            <Link href="/register?role=VENDOR" onClick={() => setMobileMenuOpen(false)} style={{ color: "var(--accent-purple)", fontWeight: 700 }}>
-              ★ Become a Vendor (Register)
-            </Link>
+            <div style={{ height: "8px" }} />
+            {(!currentUser || currentUser?.role !== "VENDOR") && (
+              <Link href="/register?role=VENDOR" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="outline" size="md" style={{ width: "100%", justifyContent: "center", borderColor: "rgba(157,78,221,0.4)", color: "var(--accent-purple)" }}>
+                  Become a Vendor
+                </Button>
+              </Link>
+            )}
+
+            {/* User section */}
             {currentUser && (
               <>
-                <Link href={currentUser.role === "VENDOR" ? "/vendor-dashboard" : "/dashboard"} onClick={() => setMobileMenuOpen(false)}>
+                <div style={{ height: "1px", background: "var(--border-subtle)", margin: "14px 0" }} />
+                <div style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em", color: "var(--text-muted)", marginBottom: "8px" }}>
+                  MY ACCOUNT
+                </div>
+                <Link
+                  href={currentUser.role === "VENDOR" ? "/vendor-dashboard" : "/dashboard"}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mobile-drawer-link"
+                  style={{ fontSize: "15px", fontWeight: 600, padding: "9px 12px", borderRadius: "var(--radius-sm)", display: "block" }}
+                >
                   My Portal
                 </Link>
-                <Link href="/messages" onClick={() => setMobileMenuOpen(false)}>
-                  Private Chat
+                <Link
+                  href="/messages"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="mobile-drawer-link"
+                  style={{ fontSize: "15px", fontWeight: 600, padding: "9px 12px", borderRadius: "var(--radius-sm)", display: "block" }}
+                >
+                  Messages
                 </Link>
               </>
             )}
@@ -563,7 +589,7 @@ export const Navbar: React.FC = () => {
         )}
       </header>
 
-      {/* Floating Discreet Persona Switcher (For easy demo testing without cluttering Navbar) */}
+      {/* Floating Demo Persona Switcher */}
       <div
         style={{
           position: "fixed",
@@ -583,60 +609,39 @@ export const Navbar: React.FC = () => {
               display: "flex",
               flexDirection: "column",
               gap: "8px",
-              minWidth: "220px",
+              minWidth: "210px",
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span style={{ fontSize: "11px", fontWeight: 700, color: "var(--text-muted)", letterSpacing: "0.05em" }}>
                 DEMO PERSONAS
               </span>
-              <button onClick={() => setShowDevWidget(false)} style={{ color: "var(--text-muted)", fontSize: "12px" }}>
+              <button onClick={() => setShowDevWidget(false)} style={{ color: "var(--text-muted)", fontSize: "14px" }}>
                 ✕
               </button>
             </div>
             <div style={{ display: "flex", gap: "6px" }}>
-              <button
-                onClick={() => switchPersona("owner@apextech.com")}
-                style={{
-                  flex: 1,
-                  padding: "6px",
-                  borderRadius: "6px",
-                  background: currentUser?.email === "owner@apextech.com" ? "var(--accent-cyan)" : "var(--bg-tertiary)",
-                  color: currentUser?.email === "owner@apextech.com" ? "#05070d" : "var(--text-primary)",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                }}
-              >
-                Buyer
-              </button>
-              <button
-                onClick={() => switchPersona("sales@nexushardware.com")}
-                style={{
-                  flex: 1,
-                  padding: "6px",
-                  borderRadius: "6px",
-                  background: currentUser?.email === "sales@nexushardware.com" ? "var(--accent-cyan)" : "var(--bg-tertiary)",
-                  color: currentUser?.email === "sales@nexushardware.com" ? "#05070d" : "var(--text-primary)",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                }}
-              >
-                Vendor
-              </button>
-              <button
-                onClick={() => switchPersona("admin@reversemarket.io")}
-                style={{
-                  flex: 1,
-                  padding: "6px",
-                  borderRadius: "6px",
-                  background: currentUser?.email === "admin@reversemarket.io" ? "var(--accent-cyan)" : "var(--bg-tertiary)",
-                  color: currentUser?.email === "admin@reversemarket.io" ? "#05070d" : "var(--text-primary)",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                }}
-              >
-                Admin
-              </button>
+              {[
+                { label: "Buyer", email: "owner@apextech.com" },
+                { label: "Vendor", email: "sales@nexushardware.com" },
+                { label: "Admin", email: "admin@reversemarket.io" },
+              ].map(({ label, email }) => (
+                <button
+                  key={email}
+                  onClick={() => switchPersona(email)}
+                  style={{
+                    flex: 1,
+                    padding: "6px 4px",
+                    borderRadius: "6px",
+                    background: currentUser?.email === email ? "var(--accent-cyan)" : "var(--bg-tertiary)",
+                    color: currentUser?.email === email ? "#05070d" : "var(--text-primary)",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
         ) : (
