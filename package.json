@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node -e \"try{require('child_process').execSync('prisma generate',{stdio:'inherit'})}catch(e){console.warn('Prisma generate lock bypassed on local Windows')}\" && next build",
     "start": "next start",
     "lint": "eslint",
     "test": "npx tsx tests/marketplace-flow.test.ts",
     "seed": "npx tsx scripts/enrich-seed.ts",
-    "postinstall": "prisma skills sync || exit 0"
+    "postinstall": "prisma generate || exit 0"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

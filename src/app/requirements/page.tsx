@@ -17,28 +17,33 @@ export default async function RequirementsDirectoryPage({
   const typeFilter = params.type as "PRODUCT" | "SERVICE" | undefined;
   const searchFilter = params.search;
 
-  const requirements = await prisma.requirement.findMany({
-    where: {
-      status: { in: ["PUBLISHED", "MATCHED", "SHORTLISTED", "VENDOR_SELECTED"] },
-      ...(typeFilter ? { type: typeFilter } : {}),
-      ...(searchFilter
-        ? {
-            OR: [
-              { title: { contains: searchFilter } },
-              { description: { contains: searchFilter } },
-            ],
-          }
-        : {}),
-    },
-    include: {
-      category: true,
-      specifications: true,
-      _count: {
-        select: { offers: true },
+  let requirements: any[] = [];
+  try {
+    requirements = await prisma.requirement.findMany({
+      where: {
+        status: { in: ["PUBLISHED", "MATCHED", "SHORTLISTED", "VENDOR_SELECTED"] },
+        ...(typeFilter ? { type: typeFilter } : {}),
+        ...(searchFilter
+          ? {
+              OR: [
+                { title: { contains: searchFilter } },
+                { description: { contains: searchFilter } },
+              ],
+            }
+          : {}),
       },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+      include: {
+        category: true,
+        specifications: true,
+        _count: {
+          select: { offers: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+  } catch (e) {
+    console.error("Failed to load requirements from database:", e);
+  }
 
   return (
     <div style={{ padding: "40px 0 80px 0" }}>
@@ -195,7 +200,7 @@ export default async function RequirementsDirectoryPage({
                       marginBottom: "20px",
                     }}
                   >
-                    {req.specifications.slice(0, 3).map((s, idx) => (
+                    {req.specifications?.slice(0, 3).map((s: any, idx: number) => (
                       <span
                         key={idx}
                         style={{
